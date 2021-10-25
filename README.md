@@ -8,8 +8,7 @@ Documentation for usage will be updated as the project becomes functional.
 ## Installation
 1) Install [OpenAi gym](https://gym.openai.com/docs/)
 2) Clone this repository
-3) Install package via  
-`pip install -e .`
+3) Install package via `pip install -e .`
 
 ## Usage
 ```python
