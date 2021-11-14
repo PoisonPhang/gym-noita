@@ -8,12 +8,15 @@ file_not_found = "FileNotFound!"
 
 radar_string = ''.join(open("C:\\Users\\poiso\\projects\\gym-noita\\gym_noita\\util\\radar.lua").readlines())
 
+debug = True
+
 
 class NoitaConnection():
 
     def __init__(self) -> None:
         self.connected = False
         self.token = self.get_token()
+        self.state = {}
 
     def get_token(self):
         if os.path.exists(noita_ws_token_file):
@@ -34,14 +37,33 @@ class NoitaConnection():
                 await connection.send(connection_string)
                 self.connected = True
 
+                data = ""
+
                 try:
                     while self.connected:
                         await connection.send(radar_string)
+                        data_is_json = False
                         data = await connection.recv()
-                        print(f"<<< {data}")
-                except:
+                        data = data.split('> ')[1]
+
+                        if (data[0] == '{'):
+                            self.state = json.loads(data)
+                            data_is_json = True
+                        elif "[no value]" not in data:
+                            print("Non-State Message: ", data)
+                        
+                        if not data_is_json:
+                            continue
+
+                        print("hp: ", self.state['hp'])
+                        print("enemies: ", len(self.state['enemies']))
+                        
+                except websockets.exceptions.ConnectionClosedError:
+                    print("Connection closed by game. Exiting...")
                     self.connected = False
                     await connection.close()
+                except json.decoder.JSONDecodeError:
+                    print('Error parsing JSON: ', data)
 
                 if os.path.exists(noita_ws_token_file):
                     os.remove(noita_ws_token_file)
