@@ -17,6 +17,7 @@ class NoitaConnection():
         self.connected = False
         self.token = self.get_token()
         self.state = {}
+        self.is_dead = False
 
     def get_token(self):
         if os.path.exists(noita_ws_token_file):
@@ -46,6 +47,11 @@ class NoitaConnection():
                         data = await connection.recv()
                         data = data.split('> ')[1]
 
+                        if "player is dead" in data:
+                            self.is_dead = True
+                            print("Player died. Reset necessary")
+                            break
+
                         if (data[0] == '{'):
                             self.state = json.loads(data)
                             data_is_json = True
@@ -57,16 +63,25 @@ class NoitaConnection():
 
                         print("hp: ", self.state['hp'])
                         print("enemies: ", len(self.state['enemies']))
+
+                        hit_count = 0
+
+                        for enemy in self.state['enemies']:
+                            if enemy['has_shot']:
+                                hit_count += 1
+                        print("valid shots: ", hit_count)
                         
                 except websockets.exceptions.ConnectionClosedError:
                     print("Connection closed by game. Exiting...")
                     self.connected = False
-                    await connection.close()
                 except json.decoder.JSONDecodeError:
                     print('Error parsing JSON: ', data)
 
                 if os.path.exists(noita_ws_token_file):
                     os.remove(noita_ws_token_file)
+
+            await connection.close()
+            self.connected = False
         else:
             print(f"Failed to get token from {noita_ws_token_file}\nExiting...")
 
