@@ -15,9 +15,10 @@ class NoitaEnv(gym.Env):
 
     def step(self, action):
         observation = self.noita_connection.state
-        reward = self.calculate_reward(self.last_observation, observation)
+        reward = self.calculate_reward(observation)
         done = self.noita_connection.is_dead
         info = {}
+        self.last_observation = observation
         return observation, reward, done, info
 
     def reset(self):
@@ -26,10 +27,23 @@ class NoitaEnv(gym.Env):
         self.last_observation = self.noita_connection.state
     
     def render(self, mode='human'):
-        print('\nimplement render\n')
+        pass
     
     def close(self):
-        print('\nimplement close\n')
-    
-    def calculate_reward(last, current):
         pass
+    
+    def calculate_reward(self, current):
+        last = self.last_observation
+        reward = 0
+
+        if self.noita_connection.is_dead:
+            return 0
+        
+        if last['pos']['y'] > current['pos']['y']:
+            reward += 1
+        if last['max_hp'] < current['max_hp']:
+            reward += 1
+        if last['hp'] < current['hp']:
+            reward += 1
+        if last['money'] < current['money']:
+            reward += 1

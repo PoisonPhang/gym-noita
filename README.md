@@ -19,3 +19,24 @@ env = gym.make('Noita-v0')
 ```
 
 ## Environment
+
+### State update JSON
+```json
+{ 
+  "pos": { 
+    "x": 385.95785522461, 
+    "y": 301.39401245117 
+  }, 
+  "hp": 4, 
+  "max_hp": 4, 
+  "money": 25, 
+  "enemies": [  
+    { 
+      "name": "$animal_blob", 
+      "x": 258.60000610352, 
+      "y": 511, 
+      "has_shot":false 
+    }
+  ] 
+}
+```

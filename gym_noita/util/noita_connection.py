@@ -53,6 +53,7 @@ class NoitaConnection():
                             break
 
                         if (data[0] == '{'):
+                            print(data)
                             self.state = json.loads(data)
                             data_is_json = True
                         elif "[no value]" not in data:
@@ -70,6 +71,7 @@ class NoitaConnection():
                             if enemy['has_shot']:
                                 hit_count += 1
                         print("valid shots: ", hit_count)
+                        print()
                         
                 except websockets.exceptions.ConnectionClosedError:
                     print("Connection closed by game. Exiting...")
