@@ -39,11 +39,11 @@ class NoitaEnv(gym.Env):
         if self.noita_connection.is_dead:
             return 0
         
-        if last['pos']['y'] > current['pos']['y']:
+        if last['pos']['y'] - current['pos']['y'] > 30: # Reward agent for moving down
             reward += 1
-        if last['max_hp'] < current['max_hp']:
+        if last['max_hp'] < current['max_hp']: # Reward agent for increasing max hp
             reward += 1
-        if last['hp'] < current['hp']:
+        if last['hp'] < current['hp']: # Reward agent for healing
             reward += 1
-        if last['money'] < current['money']:
+        if last['money'] < current['money']: # Reward agent for getting money
             reward += 1
