@@ -2,6 +2,31 @@ import pyvjoy
 import time
 
 class ControllerInput():
+    MOVE = 'move'
+    AIM = 'aim'
+    KICK = 'kick'
+    ATTACK = 'attack'
+    T_FLIGHT = 'toggle_flight'
+
+    ACTION_LOOKUP = {
+        0: MOVE,
+        1: AIM,
+        2: KICK,
+        3: ATTACK,
+        4: T_FLIGHT,
+    }
+
+    def perform_action(self, action, parameters):
+       switch = {
+           MOVE: self.set_left_stick(parameters[0], parameters[1]),
+           AIM: self.set_right_stick(parameters[0], parameters[1]),
+           KICK: self.kick(),
+           ATTACK: self.attack(),
+           T_FLIGHT: self.toggle_flight(),
+       }
+
+       switch.get(action)
+
     def __init__(self) -> None:
         self.controller = pyvjoy.VJoyDevice(1)
         self.is_flying = False

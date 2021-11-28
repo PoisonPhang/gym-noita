@@ -12,8 +12,17 @@ class NoitaEnv(gym.Env):
         self.noita_connection = NoitaConnection()
         self.noita_connection.start()
         self.last_observation = self.noita_connection.state
+        
+        self.action_space = spaces.Tuple(
+            spaces.Box(low=-2, high=1, shape=2), # move
+            spaces.Box(low=-2, high=1, shape=2), # aim
+            spaces.Discrete(0), # kick
+            spaces.Discrete(0), # attack
+            spaces.Discrete(0), # toggle flight
+        )
 
     def step(self, action):
+
         observation = self.noita_connection.state
         reward = self.calculate_reward(observation)
         done = self.noita_connection.is_dead
