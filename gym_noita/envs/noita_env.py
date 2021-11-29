@@ -1,6 +1,7 @@
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
+import numpy as np
 
 from gym_noita.util.noita_connection import NoitaConnection
 from gym_noita.util.controller_input import ControllerInput
@@ -65,8 +66,8 @@ class NoitaEnv(gym.Env):
         if self.noita_connection.is_dead:
             return 0
         
-        if last['pos']['y'] - current['pos']['y'] > 30: # Reward agent for moving down
-            reward += 1
+        reward += np.clip(0, None, current['position']['y']) / 100 # Reward agent for moving down 
+
         if last['max_hp'] < current['max_hp']: # Reward agent for increasing max hp
             reward += 1
         if last['hp'] < current['hp']: # Reward agent for healing
@@ -93,3 +94,5 @@ class NoitaEnv(gym.Env):
         state['max_hp'] = [player_max_hp]
         state['money'] = [player_money]
         state['enemies'] = enemies
+        
+        return state
