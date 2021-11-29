@@ -4,6 +4,8 @@ from gym.utils import seeding
 
 from gym_noita.util.noita_connection import NoitaConnection
 
+MAX_ENEMIES_TRACKED = 30
+
 class NoitaEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -21,9 +23,17 @@ class NoitaEnv(gym.Env):
             spaces.Discrete(0), # toggle flight
         )
 
+        self.observation_space = spaces.Dict({
+            'position': spaces.Box(shape=2), # player position (x,y)
+            'hp': spaces.Box(low=0, shape=1), # player hp
+            'max_hp': spaces.Box(low=0, shape=1), # player max hp
+            'money': spaces.Box(low=0, shape=1), # player money:7
+            'enemies': spaces.Box(low=0, shape=(MAX_ENEMIES_TRACKED, 4)) # enemies (enemy type, x, y, has line of sight)
+        })
+
     def step(self, action):
 
-        observation = self.noita_connection.state
+        observation = self.json_to_state(self.noita_connection.state) 
         reward = self.calculate_reward(observation)
         done = self.noita_connection.is_dead
         info = {}
@@ -56,3 +66,23 @@ class NoitaEnv(gym.Env):
             reward += 1
         if last['money'] < current['money']: # Reward agent for getting money
             reward += 1
+
+    def json_to_state(json_state):
+        state = {}
+        player_x = json_state['pos']['x']
+        player_y = json_state['pos']['y']
+        player_hp = json_state['hp']
+        player_max_hp = json_state['max_hp']
+        player_money = json_state['money']
+        enemies = []
+
+        for enemy in json_state[enemies]:
+            enemies.append([1, enemy['x'], enemy['y'], enemy['has_shot']])
+            if len(enemies >= MAX_ENEMIES_TRACKED):
+                break
+        
+        state['position'] = [player_x, player_y]
+        state['hp'] = [player_hp]
+        state['max_hp'] = [player_max_hp]
+        state['money'] = [player_money]
+        state['enemies'] = enemies

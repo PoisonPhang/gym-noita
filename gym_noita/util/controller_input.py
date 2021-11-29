@@ -18,11 +18,11 @@ class ControllerInput():
 
     def perform_action(self, action, parameters):
        switch = {
-           MOVE: self.set_left_stick(parameters[0], parameters[1]),
-           AIM: self.set_right_stick(parameters[0], parameters[1]),
-           KICK: self.kick(),
-           ATTACK: self.attack(),
-           T_FLIGHT: self.toggle_flight(),
+           self.MOVE: self.set_left_stick(parameters[0], parameters[1]),
+           self.AIM: self.set_right_stick(parameters[0], parameters[1]),
+           self.KICK: self.kick(),
+           self.ATTACK: self.attack(),
+           self.T_FLIGHT: self.toggle_flight(),
        }
 
        switch.get(action)
