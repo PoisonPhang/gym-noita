@@ -41,11 +41,39 @@ then
   local max_hp = '"max_hp": ' .. tostring(max_hp_v) .. ', '
   local money = '"money": ' .. tostring(money_v) .. ', '
   
+  local range = 50
+
+  local n_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x, p_y - range)
+  local ne_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x + range, p_y - range)
+  local e_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x + range, p_y)  
+  local se_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x + range, p_y + range)
+  local s_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x, p_y + range)
+  local sw_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x - range, p_y + range)
+  local w_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x - range, p_y)
+  local nw_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x - range, p_y - range)
+  
+  
+  local n_blocked = '"north_blocked": ' .. tostring(n_blocked_v) .. ', '
+  local ne_blocked = '"northeast_blocked": ' .. tostring(ne_blocked_v) .. ', '
+  local e_blocked = '"east_blocked": ' .. tostring(e_blocked_v) .. ', '
+  local se_blocked = '"southeast_blocked": ' .. tostring(se_blocked_v) .. ', '
+  local s_blocked = '"south_blocked": ' .. tostring(s_blocked_v) .. ', '
+  local sw_blocked = '"southwest_blocked": ' .. tostring(sw_blocked_v) .. ', '
+  local w_blocked = '"west_blocked": ' .. tostring(w_blocked_v) .. ', '
+  local nw_blocked = '"northwest_blocked": ' .. tostring(nw_blocked_v) .. ', '
   -- collect output
   output = output .. pos
   output = output .. hp
   output = output .. max_hp
   output = output .. money
+  output = output .. n_blocked
+  output = output .. ne_blocked
+  output = output .. e_blocked
+  output = output .. se_blocked
+  output = output .. s_blocked
+  output = output .. sw_blocked
+  output = output .. w_blocked
+  output = output .. nw_blocked
   output = output .. enemies
 else
   output = output .. ' "state": "player is dead"'

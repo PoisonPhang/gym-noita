@@ -13,10 +13,10 @@ class NoitaEnv(gym.Env):
 
     def __init__(self):
         super().__init__()
+        self.controller_input = ControllerInput()
         self.noita_connection = NoitaConnection()
         self.noita_connection.start()
         self.last_observation = self.noita_connection.state
-        self.controller_input = ControllerInput()
         
         self.action_space = spaces.Tuple(
             spaces.Box(low=-2, high=1, shape=2), # move
@@ -38,7 +38,7 @@ class NoitaEnv(gym.Env):
         action_index = action[0]
         act = self.controller_input.ACTION_LOOKUP[action_index]
         param = action[1][action_index][0]
-        self.controller_input.perform_action(action[1]) 
+        self.controller_input.perform_action(act, param) 
 
         observation = self.json_to_state(self.noita_connection.state) 
         reward = self.calculate_reward(observation)
