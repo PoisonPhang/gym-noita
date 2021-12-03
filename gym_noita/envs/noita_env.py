@@ -79,7 +79,7 @@ class NoitaEnv(gym.Env):
         if last['money'] < current['money']: # Reward agent for getting money
             reward += 1
 
-    def json_to_state(json_state):
+    def json_to_state(self, json_state):
         state = {}
         player_x = json_state['pos']['x']
         player_y = json_state['pos']['y']
@@ -90,7 +90,7 @@ class NoitaEnv(gym.Env):
 
         for enemy in json_state[enemies]:
             enemies.append([1, enemy['x'], enemy['y'], enemy['has_shot']])
-            if len(enemies >= MAX_ENEMIES_TRACKED):
+            if len(enemies) >= MAX_ENEMIES_TRACKED:
                 break
         
         state['position'] = [player_x, player_y]
