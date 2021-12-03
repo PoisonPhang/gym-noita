@@ -62,17 +62,6 @@ class NoitaConnection():
                         if not data_is_json:
                             continue
 
-                        print("hp: ", self.state['hp'])
-                        print("enemies: ", len(self.state['enemies']))
-
-                        hit_count = 0
-
-                        for enemy in self.state['enemies']:
-                            if enemy['has_shot']:
-                                hit_count += 1
-                        print("valid shots: ", hit_count)
-                        print()
-                        
                 except websockets.exceptions.ConnectionClosedError:
                     print("Connection closed by game. Exiting...")
                     self.connected = False
@@ -87,8 +76,8 @@ class NoitaConnection():
         else:
             print(f"Failed to get token from {noita_ws_token_file}\nExiting...")
 
-test = NoitaConnection()
-print(test.token)
+# test = NoitaConnection()
+# print(test.token)
 
-asyncio.run(test.start())
+# asyncio.run(test.start())
 

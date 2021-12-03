@@ -2,6 +2,7 @@ import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
 import numpy as np
+import asyncio
 
 from gym_noita.util.noita_connection import NoitaConnection
 from gym_noita.util.controller_input import ControllerInput
@@ -15,23 +16,29 @@ class NoitaEnv(gym.Env):
         super().__init__()
         self.controller_input = ControllerInput()
         self.noita_connection = NoitaConnection()
-        self.noita_connection.start()
-        self.last_observation = self.noita_connection.state
         
-        self.action_space = spaces.Tuple(
-            spaces.Box(low=-2, high=1, shape=2), # move
-            spaces.Box(low=-2, high=1, shape=2), # aim
+        self.action_space = spaces.Tuple((
+            spaces.Box(low=-1, high=1, shape=(2,), dtype=float), # move
+            spaces.Box(low=-1, high=1, shape=(2,), dtype=float), # aim
             spaces.Discrete(0), # kick
             spaces.Discrete(0), # attack
             spaces.Discrete(0), # toggle flight
-        )
+        ))
 
         self.observation_space = spaces.Dict({
-            'position': spaces.Box(shape=2), # player position (x,y)
-            'hp': spaces.Box(low=0, shape=1), # player hp
-            'max_hp': spaces.Box(low=0, shape=1), # player max hp
-            'money': spaces.Box(low=0, shape=1), # player money:7
-            'enemies': spaces.Box(low=0, shape=(MAX_ENEMIES_TRACKED, 4)) # enemies (enemy type, x, y, has line of sight)
+            'position': spaces.Box(low=1000000, high=1000000, shape=(2,), dtype=float), # player position (x,y)
+            'hp': spaces.Box(low=0, high=100, shape=(1,), dtype=float), # player hp
+            'max_hp': spaces.Box(low=0, high=100, shape=(1,), dtype=float), # player max hp
+            'money': spaces.Box(low=0, high=1000000, shape=(1,), dtype=float), # player money
+            'north_blocked': spaces.Discrete(2), # if direction is blocked
+            'northeast_blocked': spaces.Discrete(2), # if direction is blocked
+            'east_blocked': spaces.Discrete(2), # if direction is blocked
+            'southeast_blocked': spaces.Discrete(2), # if direction is blocked
+            'south_blocked': spaces.Discrete(2), # if direction is blocked
+            'southwest_blocked':spaces.Discrete(2),  # if direction is blocked
+            'west_blocked': spaces.Discrete(2), # if direction is blocked
+            'northwest_blocked': spaces.Discrete(2), # if direction is blocked
+            'enemies': spaces.Box(low=1000000, high=1000000, shape=(MAX_ENEMIES_TRACKED, 4), dtype=float) # enemies (enemy type, x, y, has line of sight)
         })
 
     def step(self, action):
@@ -50,13 +57,10 @@ class NoitaEnv(gym.Env):
     def reset(self):
         self.noita_connection = NoitaConnection()
         self.controller_input = ControllerInput()
-        self.noita_connection.start()
+        asyncio.run(self.noita_connection.start())
         self.last_observation = self.noita_connection.state
     
     def render(self, mode='human'):
-        pass
-    
-    def close(self):
         pass
     
     def calculate_reward(self, current):
@@ -93,6 +97,14 @@ class NoitaEnv(gym.Env):
         state['hp'] = [player_hp]
         state['max_hp'] = [player_max_hp]
         state['money'] = [player_money]
+        state['north_blocked'] = json_state['north_blocked']
+        state['northeast_blocked'] = json_state['northeast_blocked']
+        state['east_blocked'] = json_state['east_blocked']
+        state['southeast_blocked'] = json_state['southeast_blocked']
+        state['south_blocked'] = json_state['south_blocked']
+        state['southwest_blocked'] = json_state['southwest_blocked']
+        state['west_blocked'] = json_state['west_blocked']
+        state['northwest_blocked'] = json_state['northwest_blocked']
         state['enemies'] = enemies
         
         return state

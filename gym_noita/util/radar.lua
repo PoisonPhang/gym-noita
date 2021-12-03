@@ -1,6 +1,8 @@
 local cx, cy = GameGetCameraPos()
 local output = '{ '
 
+local bool_to_int = { [true]=1, [false]=0 }
+
 local wallets = EntityGetComponent(get_player(), 'WalletComponent')
 local dmg_comps = EntityGetComponent(get_player(), 'DamageModelComponent')
 
@@ -17,14 +19,7 @@ then
     local x, y = EntityGetTransform(v)
     local did_hit, hit_x, hit_y = RaytracePlatforms(p_x, p_y, x, y)
 
-    local has_shot = ""
-
-    if (did_hit)
-    then
-      has_shot = 'false'
-    else
-      has_shot = 'true'
-    end
+    local has_shot = tostring(bool_to_int[not did_hit])
 
     local enemy = ' { "name": ' .. '"' .. tostring(name) .. '"' .. ', "x": ' .. tostring(x) .. ', "y": ' .. tostring(y) .. ', "has_shot":' .. has_shot .. ' },'
     enemies = enemies .. enemy
@@ -53,14 +48,14 @@ then
   local nw_blocked_v, x, y = RaytracePlatforms(p_x, p_y, p_x - range, p_y - range)
   
   
-  local n_blocked = '"north_blocked": ' .. tostring(n_blocked_v) .. ', '
-  local ne_blocked = '"northeast_blocked": ' .. tostring(ne_blocked_v) .. ', '
-  local e_blocked = '"east_blocked": ' .. tostring(e_blocked_v) .. ', '
-  local se_blocked = '"southeast_blocked": ' .. tostring(se_blocked_v) .. ', '
-  local s_blocked = '"south_blocked": ' .. tostring(s_blocked_v) .. ', '
-  local sw_blocked = '"southwest_blocked": ' .. tostring(sw_blocked_v) .. ', '
-  local w_blocked = '"west_blocked": ' .. tostring(w_blocked_v) .. ', '
-  local nw_blocked = '"northwest_blocked": ' .. tostring(nw_blocked_v) .. ', '
+  local n_blocked = '"north_blocked": ' .. tostring(bool_to_int[n_blocked_v]) .. ', '
+  local ne_blocked = '"northeast_blocked": ' .. tostring(bool_to_int[ne_blocked_v]) .. ', '
+  local e_blocked = '"east_blocked": ' .. tostring(bool_to_int[e_blocked_v]) .. ', '
+  local se_blocked = '"southeast_blocked": ' .. tostring(bool_to_int[se_blocked_v]) .. ', '
+  local s_blocked = '"south_blocked": ' .. tostring(bool_to_int[s_blocked_v]) .. ', '
+  local sw_blocked = '"southwest_blocked": ' .. tostring(bool_to_int[sw_blocked_v]) .. ', '
+  local w_blocked = '"west_blocked": ' .. tostring(bool_to_int[w_blocked_v]) .. ', '
+  local nw_blocked = '"northwest_blocked": ' .. tostring(bool_to_int[nw_blocked_v]) .. ', '
   -- collect output
   output = output .. pos
   output = output .. hp

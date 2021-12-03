@@ -30,6 +30,10 @@ class ControllerInput():
     def __init__(self) -> None:
         self.controller = pyvjoy.VJoyDevice(1)
         self.is_flying = False
+        self.kick()
+        time.sleep(1)
+        self.kick()
+        time.sleep(3)
 
     def set_left_stick(self, x, y):
         self.controller.set_axis(pyvjoy.HID_USAGE_X, self.scale_input(x))
