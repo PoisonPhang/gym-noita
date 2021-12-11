@@ -32,6 +32,7 @@ class NoitaConnection():
         uri = "ws://localhost:9777"
 
         if self.token != file_not_found:
+            print("Connecting with token: ", self.token)
             async with websockets.connect(uri) as connection:
 
                 connection_string = f'AUTH "{self.token}"';
@@ -39,28 +40,24 @@ class NoitaConnection():
                 self.connected = True
 
                 data = ""
+                not_state_data = True
 
                 try:
-                    while self.connected:
+                    while not_state_data:
                         await connection.send(radar_string)
-                        data_is_json = False
                         data = await connection.recv()
                         data = data.split('> ')[1]
-
+                    
                         if "player is dead" in data:
                             self.is_dead = True
                             print("Player died. Reset necessary")
-                            break
 
                         if (data[0] == '{'):
-                            print(data)
                             self.state = json.loads(data)
-                            data_is_json = True
+                            not_state_data = False
                         elif "[no value]" not in data:
                             print("Non-State Message: ", data)
-                        
-                        if not data_is_json:
-                            continue
+
 
                 except websockets.exceptions.ConnectionClosedError:
                     print("Connection closed by game. Exiting...")
@@ -68,14 +65,16 @@ class NoitaConnection():
                 except json.decoder.JSONDecodeError:
                     print('Error parsing JSON: ', data)
 
-                if os.path.exists(noita_ws_token_file):
-                    os.remove(noita_ws_token_file)
-
             await connection.close()
             self.connected = False
+
+            return self.state
         else:
             print(f"Failed to get token from {noita_ws_token_file}\nExiting...")
 
+    def __del__(self):
+        if os.path.exists(noita_ws_token_file):
+                    os.remove(noita_ws_token_file)
 # test = NoitaConnection()
 # print(test.token)
 

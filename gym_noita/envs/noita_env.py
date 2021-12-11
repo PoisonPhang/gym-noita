@@ -20,9 +20,9 @@ class NoitaEnv(gym.Env):
         self.action_space = spaces.Tuple((
             spaces.Box(low=-1, high=1, shape=(2,), dtype=float), # move
             spaces.Box(low=-1, high=1, shape=(2,), dtype=float), # aim
-            spaces.Discrete(0), # kick
-            spaces.Discrete(0), # attack
-            spaces.Discrete(0), # toggle flight
+            spaces.Discrete(2), # kick
+            spaces.Discrete(2), # attack
+            spaces.Discrete(2), # toggle flight
         ))
 
         self.observation_space = spaces.Dict({
@@ -42,12 +42,9 @@ class NoitaEnv(gym.Env):
         })
 
     def step(self, action):
-        action_index = action[0]
-        act = self.controller_input.ACTION_LOOKUP[action_index]
-        param = action[1][action_index][0]
-        self.controller_input.perform_action(act, param) 
+        self.controller_input.perform_action(action) 
 
-        observation = self.json_to_state(self.noita_connection.state) 
+        observation = self.json_to_state(asyncio.run(self.noita_connection.start())) 
         reward = self.calculate_reward(observation)
         done = self.noita_connection.is_dead
         info = {}
@@ -57,8 +54,9 @@ class NoitaEnv(gym.Env):
     def reset(self):
         self.noita_connection = NoitaConnection()
         self.controller_input = ControllerInput()
-        asyncio.run(self.noita_connection.start())
-        self.last_observation = self.noita_connection.state
+        self.last_observation = asyncio.run(self.noita_connection.start())
+
+        return self.last_observation
     
     def render(self, mode='human'):
         pass
